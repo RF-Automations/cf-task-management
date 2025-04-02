@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "User" ALTER COLUMN "banned" DROP NOT NULL,
+ALTER COLUMN "college_name" DROP NOT NULL;

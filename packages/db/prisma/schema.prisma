@@ -1,0 +1,88 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id                  String    @id @default(uuid())
+  role                Role?     @default(member)
+  active              Boolean?
+  approved            Boolean?
+  banned              Boolean?
+  clerkuuid           String?
+  onboarding          Boolean?  @default(false)
+  college_name        String?
+  state               String?
+  city                String?
+  previous_experience String[]  @default([])
+  current_skills      String[]  @default([])
+  learning_goals      String[]  @default([])
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime?
+
+  task       Task[]
+  submission Submission[]
+}
+
+enum Role {
+  admin
+  mentor
+  member
+  ta
+  moderator
+}
+
+model Task {
+  id               String           @id @default(uuid())
+  userId           String
+  approved         Boolean?         @default(false)
+  title            String?
+  description      String?
+  difficulty_level DifficultyLevel?
+  reassigned       Int              @default(0)
+  prerequisites    String?
+  outcomes         String?
+  dead_line        DateTime?
+  status           TaskStatus       @default(inprogress)
+  user             User             @relation(fields: [userId], references: [id])
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime?
+
+  submission  Submission[]
+}
+
+model Submission {
+  id          String   @id @default(uuid())
+  userId      String
+  taskId      String
+  github      String
+  source_link String[] @default([])
+  user        User     @relation(fields: [userId], references: [id])
+  task        Task @relation(fields: [taskId], references: [id])
+}
+
+enum TaskStatus {
+  assigned
+  submitted
+  reassigned
+  completed
+  inprogress
+}
+
+enum DifficultyLevel {
+  easy
+  medium
+  moderate
+  hard
+}
