@@ -32,6 +32,7 @@ interface Task {
   status: "assigned" | "submitted" | "reassigned" | "completed" | "inprogress";
   prerequisites?: string;
   deadline?: string;
+  createdAt?: Date;
 }
 
 // Define form schema
@@ -151,6 +152,14 @@ export function TaskDetailsModal({
           <div>
             <h3 className="font-semibold text-sm">Expected Outcomes</h3>
             <p className="text-sm mt-1">{task.outcomes}</p>
+          </div>
+          <div>
+            <h3 className="font-semibold text-sm">Created At</h3>
+            <p className="text-sm mt-1">{new Date(task.createdAt!).toLocaleDateString() + " - " + new Date(task.createdAt!).toLocaleTimeString()}</p>
+          </div>
+          <div>
+            <h3 className="font-semibold text-sm">Deadline</h3>
+            <p className="text-sm mt-1">{task?.deadline || " - "}</p>
           </div>
 
           {task.prerequisites && (

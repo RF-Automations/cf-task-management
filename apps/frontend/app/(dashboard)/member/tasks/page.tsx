@@ -19,6 +19,7 @@ interface Task {
   status: "assigned" | "submitted" | "reassigned" | "completed" | "inprogress";
   prerequisites?: string;
   deadline?: string;
+  createdAt?: Date;
 }
 
 const taskOptions: Task[] = [
@@ -253,7 +254,7 @@ export default function TasksPage() {
         {/* Table Header */}
         <div className="hidden md:grid md:grid-cols-12 md:gap-4 p-4 border-b bg-gray-50 font-medium">
           <div className="col-span-5">Task</div>
-          <div className="col-span-2">Deadline</div>
+          <div className="col-span-2">Created At</div>
           <div className="col-span-2">Difficulty Level</div>
           <div className="col-span-2">Status</div>
           <div className="col-span-1">Action</div>
@@ -274,12 +275,13 @@ export default function TasksPage() {
             >
               {/* Mobile view - stacked layout */}
               <div className="col-span-1 md:col-span-5 font-medium">
+                {/* {task.title} */}
                 {task.title}
               </div>
 
               <div className="grid grid-cols-2 md:hidden gap-2 text-sm text-gray-500">
-                <div>Deadline:</div>
-                <div>{task.deadline || "-"}</div>
+                <div>Created At:</div>
+                <div>{new Date(task.createdAt!).toLocaleDateString() + " - " + new Date(task.createdAt!).toLocaleTimeString() || "-"}</div>
 
                 <div>Difficulty:</div>
                 <div>
@@ -317,7 +319,7 @@ export default function TasksPage() {
 
               {/* Desktop view - columns */}
               <div className="hidden md:block md:col-span-2">
-                {task.deadline || "-"}
+                {new Date(task.createdAt!).toLocaleDateString() + " - " + new Date(task.createdAt!).toLocaleTimeString() || "-"}
               </div>
               <div className="hidden md:block md:col-span-2">
                 <span
