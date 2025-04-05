@@ -102,8 +102,8 @@ export default function DashboardPage() {
     <div className="space-y-8 p-4 md:p-6">
       <div>
         <h2 className="text-2xl lg:text-3xl font-bold tracking-tight">
-          Welcome back, <br className="block md:hidden" />{" "}
-          <span className="text-muted-foreground text-lg lg:text-xl">
+          <span className="text-xl lg:text-2xl">Welcome back, </span> <br className="block md:hidden" />{" "}
+          <span className="text-orange-400">
             {username}
           </span>
         </h2>

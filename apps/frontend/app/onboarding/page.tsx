@@ -282,7 +282,7 @@ const OnboardingFlow = () => {
     switch (step) {
       case 1:
         return (
-          <div className="space-y-6">
+          <div className="space-y-6 px-2">
             <Card className="w-full">
               <CardHeader>
                 <CardTitle className="text-2xl">
@@ -342,18 +342,22 @@ const OnboardingFlow = () => {
 
       case 2:
         return (
-          <form className="space-y-6">
-            <Card className="min-w-md">
+          <form className="space-y-6 px-2 w-full max-w-3xl mx-auto">
+            <Card className="w-full">
               <CardHeader>
-                <CardTitle>Your Profile & Experience</CardTitle>
-                <CardDescription>
+                <CardTitle className="text-xl md:text-2xl">
+                  Your Profile & Experience
+                </CardTitle>
+                <CardDescription className="text-sm md:text-base">
                   Tell us about yourself so we can personalize your experience
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
                   <div className="grid gap-2">
-                    <Label htmlFor="college">College/University</Label>
+                    <Label htmlFor="college" className="text-sm md:text-base">
+                      College/University
+                    </Label>
                     <Input
                       id="college"
                       placeholder="Enter your institution"
@@ -362,11 +366,15 @@ const OnboardingFlow = () => {
                       onChange={(e: any) =>
                         setProfile({ ...profile, college: e.target.value })
                       }
+                      className="w-full"
                     />
                   </div>
 
                   <div className="grid gap-2">
-                    <Label htmlFor="experience">
+                    <Label
+                      htmlFor="experience"
+                      className="text-sm md:text-base"
+                    >
                       Previous Experience (if any)
                     </Label>
                     <Textarea
@@ -377,11 +385,14 @@ const OnboardingFlow = () => {
                       onChange={(e: any) =>
                         setProfile({ ...profile, experience: e.target.value })
                       }
+                      className="w-full min-h-24"
                     />
                   </div>
 
                   <div className="grid gap-2">
-                    <Label htmlFor="skills">Current Skills</Label>
+                    <Label htmlFor="skills" className="text-sm md:text-base">
+                      Current Skills
+                    </Label>
                     <Textarea
                       id="skills"
                       placeholder="What programming languages and technologies are you familiar with? (seperate each skills with ',')"
@@ -390,11 +401,14 @@ const OnboardingFlow = () => {
                       onChange={(e: any) =>
                         setProfile({ ...profile, skills: e.target.value })
                       }
+                      className="w-full min-h-24"
                     />
                   </div>
 
                   <div className="grid gap-2">
-                    <Label htmlFor="goals">Learning Goals</Label>
+                    <Label htmlFor="goals" className="text-sm md:text-base">
+                      Learning Goals
+                    </Label>
                     <Textarea
                       id="goals"
                       placeholder="What do you hope to learn or achieve in this community? (seperate your learning goals with ',')"
@@ -403,18 +417,20 @@ const OnboardingFlow = () => {
                       onChange={(e: any) =>
                         setProfile({ ...profile, goals: e.target.value })
                       }
+                      className="w-full min-h-24"
                     />
                   </div>
                 </div>
               </CardContent>
-              <CardFooter>
+              <CardFooter className="flex justify-end md:justify-start">
                 <Button
                   type="submit"
                   onClick={handleProfileSubmit}
                   disabled={loading}
+                  className="w-full sm:w-auto"
                 >
                   {loading && (
-                    <Loader2 className="h-4 w-4 text-yellow-600 animate-spin" />
+                    <Loader2 className="h-4 w-4 text-yellow-600 animate-spin mr-2" />
                   )}
                   Go to Continue
                 </Button>
@@ -425,7 +441,7 @@ const OnboardingFlow = () => {
 
       case 3:
         return (
-          <div className="space-y-6">
+          <div className="space-y-6 px-2">
             <Card className="w-full">
               <CardHeader>
                 <CardTitle>Community Rules & Guidelines</CardTitle>
@@ -511,7 +527,7 @@ const OnboardingFlow = () => {
 
       case 4:
         return (
-          <div className="space-y-6">
+          <div className="space-y-6 px-2 overflow-y-scroll">
             <Card className="w-full">
               <CardHeader>
                 <CardTitle>Task Assignment</CardTitle>
@@ -570,11 +586,6 @@ const OnboardingFlow = () => {
                           key={task.id}
                           className="flex items-start space-x-2"
                         >
-                          <RadioGroupItem
-                            value={task.id}
-                            id={`task-${task.id}`}
-                            className="mt-1"
-                          />
                           <div className="grid gap-1.5 leading-none">
                             <Label
                               htmlFor={`task-${task.id}`}
@@ -619,7 +630,7 @@ const OnboardingFlow = () => {
 
       case 5:
         return (
-          <div className="space-y-6">
+          <div className="space-y-6 px-2">
             <Card className="w-full">
               <CardHeader>
                 <CardTitle>Welcome to Your Dashboard</CardTitle>
@@ -654,7 +665,8 @@ const OnboardingFlow = () => {
                         ) : (
                           <span className="flex gap-2">
                             <Loader2 className="h-4 w-4 text-yellow-600 animate-spin" />
-                            &quot;Moderator will review and approve your task&qout;
+                            &quot;Moderator will review and approve your
+                            task&qout;
                           </span>
                         )}
                       </span>
@@ -694,7 +706,7 @@ const OnboardingFlow = () => {
         </div>
         {step > 1 && (
           <Button
-            className="w-fit absolute -bottom-2 -right-20"
+            className="w-fit absolute -bottom-2 -right-16 md:-right-20"
             variant="outline"
             onClick={() => {
               setStep((prev) => prev - 1);

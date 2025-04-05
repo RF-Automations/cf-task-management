@@ -51,7 +51,7 @@ export function AssignTaskModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[700px]">
+      <DialogContent className="sm:max-w-[700px] overflow-y-auto max-h-[80vh]">
         <DialogHeader>
           <DialogTitle>Select a Task to Assign</DialogTitle>
         </DialogHeader>
