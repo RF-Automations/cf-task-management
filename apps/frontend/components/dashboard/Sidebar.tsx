@@ -1,31 +1,38 @@
 "use client";
 
 import { useUser } from "@clerk/nextjs";
-import { BarChart2, CheckSquare, ChevronRight, HomeIcon } from "lucide-react";
+import { BarChart2, CheckSquare, ChevronRight, HomeIcon, Users } from "lucide-react";
 import Link from "next/link";
 import React, { useState } from "react";
 
 const menus = [
   {
     lable: "Overview",
-    slug: "/member/",
-    icon: <HomeIcon className="h-6 w-6" />,
+    slug: ["/member", "/admin", "/moderator"],
+    icon: <HomeIcon className="h-5 w-5 font-bold" />,
     isActive: true,
-    role: "member",
+    role: ["member", "admin", "moderator"],
+  },
+  {
+    lable: "Users",
+    slug: ["/admin/users", "/moderator/users"],
+    icon: <Users className="h-5 w-5 font-bold" />,
+    isActive: true,
+    role: ["admin", "moderator"],
   },
   {
     lable: "Tasks",
-    slug: "/member/tasks",
-    icon: <CheckSquare className="h-6 w-6" />,
+    slug: ["/member/tasks", "/admin/tasks", "/moderator/tasks"],
+    icon: <CheckSquare className="h-5 w-5 font-bold" />,
     isActive: false,
-    role: "member",
+    role: ["member", "admin", "moderator"],
   },
   {
     lable: "Analytics",
-    slug: "/member/analytics",
-    icon: <BarChart2 className="h-6 w-6" />,
+    slug: ["/member/analytics", "/admin/analytics", "/moderator/analytics"],
+    icon: <BarChart2 className="h-5 w-5 font-bold" />,
     isActive: false,
-    role: "member",
+    role: ["member", "admin", "moderator"],
   },
 ];
 
@@ -51,31 +58,35 @@ const Sidebar = () => {
       </div>
 
       <nav className="flex flex-col h-full p-4 gap-2 w-full justify-start items-center pt-6">
-        {menus.map(
-          (menu) =>
-            user?.publicMetadata?.role === menu.role && (
+        {menus.map((menu) => {
+          const currentRole = user?.publicMetadata?.role as string;
+          const slug =
+            menu.slug[menu.role.indexOf(user?.publicMetadata?.role as string)];
+          if (menu.role.includes(currentRole)) {
+            return (
               <Link
-                href={menu.slug}
-                key={menu.slug}
+                href={slug}
+                key={slug}
                 onClick={() => {
-                  setActiveMenu(menu.slug);
+                  setActiveMenu(slug);
                   console.log(menu.slug);
                 }}
                 className={`flex items-center justify-start gap-4 p-3 rounded-md transition 
-                  ${
-                    activeMenu === menu.slug
-                      ? "bg-slate-200 hover:bg-gray-300"
-                      : "hover:bg-gray-200"
-                  }
-                  ${isOpen ? "w-full" : "w-fit"}`}
+                    ${
+                      activeMenu === slug
+                        ? "bg-slate-200 hover:bg-gray-300"
+                        : "hover:bg-gray-200"
+                    }
+                    ${isOpen ? "w-full" : "w-fit"}`}
               >
                 <div className="w-fit flex justify-center items-center">
                   {menu.icon}
                 </div>
                 {isOpen && <span>{menu.lable}</span>}
               </Link>
-            )
-        )}
+            );
+          }
+        })}
       </nav>
     </aside>
   );

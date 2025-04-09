@@ -17,7 +17,7 @@ datasource db {
 model User {
   id                  String    @id @default(uuid())
   role                Role?     @default(member)
-  active              Boolean?
+  active              DateTime?
   approved            Boolean?
   banned              Boolean?
   clerkuuid           String?
@@ -45,6 +45,7 @@ enum Role {
 
 model Task {
   id               String           @id @default(uuid())
+  assignedBy       String?
   userId           String
   approved         Boolean?         @default(false)
   title            String?
@@ -59,7 +60,7 @@ model Task {
   createdAt        DateTime         @default(now())
   updatedAt        DateTime?
 
-  submission  Submission[]
+  submission Submission[]
 }
 
 model Submission {
@@ -69,7 +70,7 @@ model Submission {
   github      String
   source_link String[] @default([])
   user        User     @relation(fields: [userId], references: [id])
-  task        Task @relation(fields: [taskId], references: [id])
+  task        Task     @relation(fields: [taskId], references: [id])
 }
 
 enum TaskStatus {

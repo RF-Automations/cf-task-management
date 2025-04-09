@@ -70,7 +70,7 @@ const OnboardingFlow = () => {
 
   useEffect(() => {
     console.log(user?.publicMetadata.role);
-    if (user?.publicMetadata?.role && user.publicMetadata.role === "admin") {
+    if (user?.publicMetadata?.role && user.publicMetadata.role !== "member") {
       navigate.push("/" + user.publicMetadata.role);
       return;
     }
