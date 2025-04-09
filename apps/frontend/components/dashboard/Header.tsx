@@ -9,7 +9,7 @@ import {
   useUser,
 } from "@clerk/nextjs";
 import React from "react";
-import { BarChart2, CheckSquare, HomeIcon, Terminal } from "lucide-react";
+import { BarChart2, CheckSquare, HomeIcon, Terminal, Users } from "lucide-react";
 import { Button } from "../ui/button";
 import { Bell } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -17,24 +17,31 @@ import { useRouter } from "next/navigation";
 const menus = [
   {
     lable: "Overview",
-    slug: "/member/",
+    slug: ["/member", "/admin", "/moderator"],
     icon: <HomeIcon className="h-4 w-4 font-bold" />,
     isActive: true,
-    role: "member",
+    role: ["member", "admin", "moderator"],
+  },
+  {
+    lable: "Users",
+    slug: ["/admin/users", "/moderator/users"],
+    icon: <Users className="h-5 w-5 font-bold" />,
+    isActive: true,
+    role: ["admin", "moderator"],
   },
   {
     lable: "Tasks",
-    slug: "/member/tasks",
+    slug: ["/member/tasks", "/admin/tasks", "/moderator/tasks"],
     icon: <CheckSquare className="h-4 w-4 font-bold" />,
     isActive: false,
-    role: "member",
+    role: ["member", "admin", "moderator"],
   },
   {
     lable: "Analytics",
-    slug: "/member/analytics",
+    slug: ["/member/analytics", "/admin/analytics", "/moderator/analytics"],
     icon: <BarChart2 className="h-4 w-4 font-bold" />,
     isActive: false,
-    role: "member",
+    role: ["member", "admin", "moderator"],
   },
 ];
 
@@ -83,12 +90,28 @@ const DashboardHeader = () => {
               <UserButton.MenuItems>
                 {menus.map(
                   (menu) =>
-                    user?.publicMetadata?.role === menu.role && (
+                    menu.role.includes(
+                      user?.publicMetadata?.role as string
+                    ) && (
                       <UserButton.Action
-                        key={menu.slug}
+                        key={
+                          menu.slug[
+                            menu.role.indexOf(
+                              user?.publicMetadata?.role as string
+                            )
+                          ]
+                        }
                         label={menu.lable}
                         labelIcon={menu.icon}
-                        onClick={() => router.push(menu.slug)}
+                        onClick={() =>
+                          router.push(
+                            menu.slug[
+                              menu.role.indexOf(
+                                user?.publicMetadata?.role as string
+                              )
+                            ]
+                          )
+                        }
                       />
                     )
                 )}

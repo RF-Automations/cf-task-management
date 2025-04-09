@@ -20,6 +20,7 @@ const isMemberRoute = createRouteMatcher(["/member(.*)"]);
 
 export default clerkMiddleware(async (auth, req) => {
   const { userId, sessionClaims } = await auth();
+  const role = (await auth()).sessionClaims?.metadata?.role;
 
   if (!userId && isProtectedRoutes(req)) {
     return NextResponse.redirect(new URL("/sign-in", req.url));
@@ -30,11 +31,27 @@ export default clerkMiddleware(async (auth, req) => {
     return NextResponse.next();
   }
 
+  // For users visiting /admin, don't try to redirect
+  if (userId && isAdminRoute(req)) {
+    return NextResponse.next();
+  }
+
+  // For users visiting /moderator, don't try to redirect
+  if (userId && isModeratorRoute(req)) {
+    return NextResponse.next();
+  }
+
   // Catch users who do not have `onboardingComplete: true` in their publicMetadata
   // Redirect them to the /onboarding route to complete onboarding
+  console.log('user', role)
   if (userId) {
-    if ((await auth()).sessionClaims?.metadata?.role !== "member") {
-      return NextResponse.next();
+
+    if (isAdminRoute(req)) {
+      return NextResponse.redirect(new URL('/admin', req.url));
+    }
+
+    if (isModeratorRoute(req)) {
+      return NextResponse.redirect(new URL('/moderator', req.url));
     }
 
     if (
@@ -48,19 +65,19 @@ export default clerkMiddleware(async (auth, req) => {
 
   if (
     isMemberRoute(req) &&
-    (await auth()).sessionClaims?.metadata?.role !== "member"
+    role !== "member"
   ) {
     const url = new URL("/sign-in", req.url);
     return NextResponse.redirect(url);
   } else if (
     isAdminRoute(req) &&
-    (await auth()).sessionClaims?.metadata?.role !== "admin"
+    role !== "admin"
   ) {
     const url = new URL("/sign-in", req.url);
     return NextResponse.redirect(url);
   } else if (
     isModeratorRoute(req) &&
-    (await auth()).sessionClaims?.metadata?.role !== "moderator"
+    role !== "moderator"
   ) {
     const url = new URL("/sign-in", req.url);
     return NextResponse.redirect(url);

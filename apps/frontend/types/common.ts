@@ -39,3 +39,14 @@ export interface TaskCount {
   reassigned: number;
   assigned: number;
 }
+
+export interface User{
+  id: string;
+  name: string;
+  email: string;
+  status: 'pending' | 'approved' | 'banned';
+  createdAt: Date;
+  lastActive: Date;
+  banned: boolean;
+  approved: boolean;
+};

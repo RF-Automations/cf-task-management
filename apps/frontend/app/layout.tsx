@@ -37,7 +37,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <ClerkProvider publishableKey={PUBLISHABLE_KEY} signInFallbackRedirectUrl='/sign-in' afterSignOutUrl='/sign-in'>
+        <ClerkProvider publishableKey={PUBLISHABLE_KEY} afterSignOutUrl='/sign-in'>
           {children}
           <Toaster />
         </ClerkProvider>
