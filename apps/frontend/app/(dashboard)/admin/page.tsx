@@ -110,7 +110,7 @@ export default function AdminDashboard() {
             <CardTitle>Weekly Task Activity</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="h-[300px]">
+            <div className="h-[400px]">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart
                   data={weeklyTaskCompeletion}

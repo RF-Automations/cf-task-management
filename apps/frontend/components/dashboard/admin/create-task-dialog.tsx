@@ -32,6 +32,7 @@ const formSchema = z.object({
   title: z.string().min(1, "Title is required"),
   description: z.string().min(1, "Description is required"),
   assignedTo: z.string().min(1, "Assigned user is required"),
+  expectedOutcome: z.string().min(1, "Expected outcome is required"),
   difficulty: z.enum(["easy", "medium", "hard"]),
   deadLine: z.string().min(1, "Due date is required"),
 });
@@ -41,7 +42,33 @@ interface CreateTaskDialogProps {
   onOpenChange: (open: boolean) => void;
 }
 
-export function CreateTaskDialog({ open, onOpenChange }: CreateTaskDialogProps) {
+const users = [
+  {
+    value: "barun-tiwary",
+    label: "Barun Tiwary",
+  },
+  {
+    value: "barun-tiwary-1",
+    label: "Barun Tiwary 1",
+  },
+  {
+    value: "barun-tiwary-2",
+    label: "Barun Tiwary 3",
+  },
+  {
+    value: "barun-tiwary-3",
+    label: "Barun Tiwary 3",
+  },
+  {
+    value: "barun-tiwary-4",
+    label: "Barun Tiwary 4",
+  },
+];
+
+export function CreateTaskDialog({
+  open,
+  onOpenChange,
+}: CreateTaskDialogProps) {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -95,6 +122,19 @@ export function CreateTaskDialog({ open, onOpenChange }: CreateTaskDialogProps) 
             />
             <FormField
               control={form.control}
+              name="expectedOutcome"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Expected Outcomes</FormLabel>
+                  <FormControl>
+                    <Textarea {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
               name="assignedTo"
               render={({ field }) => (
                 <FormItem>
@@ -109,8 +149,10 @@ export function CreateTaskDialog({ open, onOpenChange }: CreateTaskDialogProps) 
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="John Doe">John Doe</SelectItem>
-                      <SelectItem value="Jane Smith">Jane Smith</SelectItem>
+                      {users.length &&
+                        users.map((user) => (
+                          <SelectItem key={user.value} value={user.value}>{user.label}</SelectItem>
+                        ))}
                     </SelectContent>
                   </Select>
                   <FormMessage />

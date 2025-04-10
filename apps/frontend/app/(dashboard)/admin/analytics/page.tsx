@@ -96,19 +96,19 @@ const filterUsers = [
 export default function AnalyticsPage() {
   const [timeRange, setTimeRange] = useState("week");
   const [value, setValue] = useState("");
-  const [comboOpen, setComboOpen] = useState(false);
+  const [userComboOpen, setUserComboOpen] = useState(false);
 
   return (
     <div className="p-6 space-y-6">
-      <div className="flex items-center justify-between flex-wrap gap-4">
+      <div className="flex items-start md:items-center justify-between flex-wrap gap-4 flex-col md:flex-row">
         <h1 className="text-3xl font-bold">Analytics</h1>
-        <div className="flex gap-4">
-          <Popover open={comboOpen} onOpenChange={setComboOpen}>
+        <div className="flex gap-4 flex-col md:flex-row">
+          <Popover open={userComboOpen} onOpenChange={setUserComboOpen}>
             <PopoverTrigger asChild>
               <Button
                 variant="outline"
                 role="combobox"
-                aria-expanded={comboOpen}
+                aria-expanded={userComboOpen}
                 className="w-[200px] justify-between"
               >
                 {value
@@ -133,7 +133,7 @@ export default function AnalyticsPage() {
                         value={user.value}
                         onSelect={(currentValue) => {
                           setValue(currentValue === value ? "" : currentValue);
-                          setComboOpen(false);
+                          setUserComboOpen(false);
                         }}
                       >
                         {user.label}

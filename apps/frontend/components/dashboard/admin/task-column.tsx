@@ -2,18 +2,15 @@
 
 import { ColumnDef } from "@tanstack/react-table";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { useState } from "react";
+import { Input } from "@/components/ui/input";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import {
-  MoreHorizontal,
-  CheckCircle,
-  RefreshCcw,
-} from "lucide-react";
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export type Task = {
   id: string;
@@ -25,6 +22,75 @@ export type Task = {
   createdAt: Date;
   updatedAt: Date;
   dead_line: Date;
+};
+
+// Custom cell components with hooks
+const StatusCell = ({ status }: { status: any }) => {
+  const [newStatus, setNewStatus] = useState(status);
+  const [changeStatus, setChangeStatus] = useState(false);
+
+  if (!changeStatus) {
+    return (
+      <Badge
+        className={
+          status === "completed"
+            ? "bg-green-500"
+            : status === "rejected"
+              ? "bg-red-500"
+              : status === "in-progress"
+                ? "bg-blue-500"
+                : "bg-yellow-500"
+        }
+        onClick={() => setChangeStatus(true)}
+      >
+        {status}
+      </Badge>
+    );
+  } else {
+    return (
+      <Select
+        value={newStatus}
+        onValueChange={setNewStatus}
+        onOpenChange={setChangeStatus}
+      >
+        <SelectTrigger className="w-[180px]">
+          <SelectValue placeholder="New Status" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="inprogress">In Progress</SelectItem>
+          <SelectItem value="reassign">Re Assign</SelectItem>
+        </SelectContent>
+      </Select>
+    );
+  }
+};
+
+const DeadlineCell = ({ date }: { date: any }) => {
+  const [input, setInput] = useState(false);
+  const [newDeadline, setNewDeadline] = useState(date);
+
+  return (
+    <div className="">
+      {!input ? (
+        <span
+          className="p-2 rounded-md w-fit cursor-pointer"
+          onClick={() => setInput(true)}
+        >
+          {date.toLocaleDateString()}
+        </span>
+      ) : (
+        <Input
+          type="date"
+          className="p-1 rounded-md w-fit"
+          value={newDeadline}
+          onChange={(e) => {
+            setNewDeadline(e.target.value);
+            setInput(false);
+          }}
+        />
+      )}
+    </div>
+  );
 };
 
 export const task_columns: ColumnDef<Task>[] = [
@@ -61,62 +127,15 @@ export const task_columns: ColumnDef<Task>[] = [
     header: "Status",
     cell: ({ row }) => {
       const status = row.getValue("status") as string;
-      return (
-        <Badge
-          className={
-            status === "completed"
-              ? "bg-green-500"
-              : status === "rejected"
-                ? "bg-red-500"
-                : status === "in-progress"
-                  ? "bg-blue-500"
-                  : "bg-yellow-500"
-          }
-        >
-          {status}
-        </Badge>
-      );
+      return <StatusCell status={status} />;
     },
   },
   {
     accessorKey: "dead_line",
-    header: "Due Date",
+    header: "Dead Line",
     cell: ({ row }) => {
       const date = row.getValue("dead_line") as Date;
-      return <div>{date.toLocaleDateString()}</div>;
-    },
-  },
-  {
-    id: "actions",
-    cell: ({ row }) => {
-      const task = row.original;
-
-      return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem
-              onClick={() => console.log("Complete", task.id)}
-              className="text-green-600"
-            >
-              <CheckCircle className="h-4 w-4 mr-2" />
-              Complete
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              onClick={() => console.log("In Progress", task.id)}
-              className="text-yellow-600"
-            >
-              <RefreshCcw className="h-4 w-4 mr-2" />
-              Re Assign
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      );
+      return <DeadlineCell date={date} />;
     },
   },
 ];

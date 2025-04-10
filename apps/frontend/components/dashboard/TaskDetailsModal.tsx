@@ -189,7 +189,7 @@ export function TaskDetailsModal({
           </div>
         </div>
 
-        {task?.status !== "completed" && task?.status !== 'submitted' ? (
+        {task?.status !== "completed" && task?.status !== 'submitted' && task?.status !== 'inprogress' ? (
           <Form {...form}>
             <form
               onSubmit={form.handleSubmit(handleSubmit)}
