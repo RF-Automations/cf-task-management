@@ -11,6 +11,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { toast } from "sonner";
+import { assignTask, updateTaskStatus } from "@/app/(dashboard)/admin/_actions";
+import { useAuth } from "@clerk/nextjs";
+import Status from "@/components/Status";
 
 export type Task = {
   id: string;
@@ -25,32 +29,37 @@ export type Task = {
 };
 
 // Custom cell components with hooks
-const StatusCell = ({ status }: { status: any }) => {
+const StatusCell = ({ status, taskId }: { status: any; taskId: string }) => {
   const [newStatus, setNewStatus] = useState(status);
   const [changeStatus, setChangeStatus] = useState(false);
+  const { getToken } = useAuth();
 
   if (!changeStatus) {
-    return (
-      <Badge
-        className={
-          status === "completed"
-            ? "bg-green-500"
-            : status === "rejected"
-              ? "bg-red-500"
-              : status === "in-progress"
-                ? "bg-blue-500"
-                : "bg-yellow-500"
-        }
-        onClick={() => setChangeStatus(true)}
-      >
-        {status}
-      </Badge>
-    );
+    return <Status status={status} onClick={() => setChangeStatus(true)} />;
   } else {
     return (
       <Select
         value={newStatus}
-        onValueChange={setNewStatus}
+        onValueChange={async (value) => {
+          const token = await getToken();
+          if (!token) {
+            toast.error("Status not udpated");
+            return setNewStatus;
+          }
+          const res = await updateTaskStatus(taskId, value, token);
+
+          console.log(res);
+          if (res.data) {
+            toast.success("Status updated succesfully");
+          }
+
+          if (res.error) {
+            console.log(res.error, res.message);
+            toast.error("Status not updated");
+          }
+          setNewStatus(value)
+          return setNewStatus;
+        }}
         onOpenChange={setChangeStatus}
       >
         <SelectTrigger className="w-[180px]">
@@ -58,16 +67,19 @@ const StatusCell = ({ status }: { status: any }) => {
         </SelectTrigger>
         <SelectContent>
           <SelectItem value="inprogress">In Progress</SelectItem>
-          <SelectItem value="reassign">Re Assign</SelectItem>
+          <SelectItem value="reassigned">Re Assign</SelectItem>
         </SelectContent>
       </Select>
     );
   }
 };
 
-const DeadlineCell = ({ date }: { date: any }) => {
+const DeadlineCell = ({ date, taskId }: { date: any; taskId: string }) => {
   const [input, setInput] = useState(false);
   const [newDeadline, setNewDeadline] = useState(date);
+
+  const { getToken } = useAuth();
+  console.log(date)
 
   return (
     <div className="">
@@ -76,14 +88,30 @@ const DeadlineCell = ({ date }: { date: any }) => {
           className="p-2 rounded-md w-fit cursor-pointer"
           onClick={() => setInput(true)}
         >
-          {date.toLocaleDateString()}
+          {date ? new Date(date)?.toLocaleDateString() : "Assign"}
         </span>
       ) : (
         <Input
           type="date"
           className="p-1 rounded-md w-fit"
           value={newDeadline}
-          onChange={(e) => {
+          onChange={async (e) => {
+            const token = await getToken();
+            if (!token) {
+              toast.error("Status not udpated");
+              return setInput;
+            }
+            const res = await assignTask(taskId, new Date(e.target.value), token);
+            
+            console.log(res);
+            if (res.data) {
+              toast.success("Task assigned");
+            }
+            
+            if (res.error) {
+              console.log(res.error, res.message);
+              toast.error("task not assigned");
+            }
             setNewDeadline(e.target.value);
             setInput(false);
           }}
@@ -101,6 +129,10 @@ export const task_columns: ColumnDef<Task>[] = [
   {
     accessorKey: "assignedTo",
     header: "Assigned To",
+  },
+  {
+    accessorKey: "assignBy",
+    header: "Assigned By",
   },
   {
     accessorKey: "difficulty_level",
@@ -127,7 +159,7 @@ export const task_columns: ColumnDef<Task>[] = [
     header: "Status",
     cell: ({ row }) => {
       const status = row.getValue("status") as string;
-      return <StatusCell status={status} />;
+      return <StatusCell status={status} taskId={row.original.id} />;
     },
   },
   {
@@ -135,7 +167,7 @@ export const task_columns: ColumnDef<Task>[] = [
     header: "Dead Line",
     cell: ({ row }) => {
       const date = row.getValue("dead_line") as Date;
-      return <DeadlineCell date={date} />;
+      return <DeadlineCell date={date} taskId={row.original.id} />;
     },
   },
 ];

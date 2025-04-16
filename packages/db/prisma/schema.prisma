@@ -18,9 +18,13 @@ model User {
   id                  String    @id @default(uuid())
   role                Role?     @default(member)
   active              DateTime?
-  approved            Boolean?
-  banned              Boolean?
+  approved            Boolean?  @default(false)
+  banned              Boolean?  @default(false)
   clerkuuid           String?
+  firstName           String?
+  lastName            String?
+  email               String?
+  lastActiveAt        DateTime?
   onboarding          Boolean?  @default(false)
   college_name        String?
   state               String?
@@ -31,8 +35,9 @@ model User {
   createdAt           DateTime  @default(now())
   updatedAt           DateTime?
 
-  task       Task[]
-  submission Submission[]
+  task        Task[]       @relation("TaskAssignee")
+  taskCreated Task[]       @relation("TaskCreator")
+  submission  Submission[]
 }
 
 enum Role {
@@ -45,7 +50,7 @@ enum Role {
 
 model Task {
   id               String           @id @default(uuid())
-  assignedBy       String?
+  assignedBy       String
   userId           String
   approved         Boolean?         @default(false)
   title            String?
@@ -56,9 +61,11 @@ model Task {
   outcomes         String?
   dead_line        DateTime?
   status           TaskStatus       @default(inprogress)
-  user             User             @relation(fields: [userId], references: [id])
   createdAt        DateTime         @default(now())
   updatedAt        DateTime?
+
+  user    User @relation("TaskAssignee", fields: [userId], references: [id], onDelete: Cascade)
+  creator User @relation("TaskCreator", fields: [assignedBy], references: [id], onDelete: Cascade)
 
   submission Submission[]
 }
@@ -69,8 +76,8 @@ model Submission {
   taskId      String
   github      String
   source_link String[] @default([])
-  user        User     @relation(fields: [userId], references: [id])
-  task        Task     @relation(fields: [taskId], references: [id])
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  task        Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
 }
 
 enum TaskStatus {

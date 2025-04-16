@@ -37,8 +37,8 @@ export const activeUserColumns: ColumnDef<ActiveUser>[] = [
             percentage >= 80
               ? "bg-green-500"
               : percentage >= 60
-              ? "bg-yellow-500"
-              : "bg-red-500"
+                ? "bg-yellow-500"
+                : "bg-red-500"
           }
         >
           {rate}
@@ -50,8 +50,14 @@ export const activeUserColumns: ColumnDef<ActiveUser>[] = [
     accessorKey: "lastActive",
     header: "Last Active",
     cell: ({ row }) => {
-      const date = row.getValue("lastActive") as Date;
-      return <div>{date.toLocaleDateString()}</div>;
+      const date = row.getValue("lastActive") as any;
+      console.log(typeof date)
+
+      if (!date) {
+        return <div className="">{date === "" ? "+++" : date}</div>;
+      } else {
+        return <div>{date?.toLocaleDateString()}</div>;
+      }
     },
   },
 ];

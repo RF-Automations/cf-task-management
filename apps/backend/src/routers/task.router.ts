@@ -110,7 +110,7 @@ router.post("/assign", async (req, res) => {
     difficulty_level,
     outcomes,
     status,
-    prerequisites,
+    prerequisites
   } = task;
 
   try {
@@ -123,7 +123,8 @@ router.post("/assign", async (req, res) => {
         outcomes,
         status,
         prerequisites,
-      },
+        assignedBy: userId
+      }
     });
 
     if (assignedTask.id) {

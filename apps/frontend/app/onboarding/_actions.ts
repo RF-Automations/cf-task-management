@@ -12,18 +12,22 @@ export const createUserInDB = async () => {
     return { message: "No logged in User" };
   }
 
+  const currentUser = await client.users.getUser(userId);
+  console.log(currentUser)
   try {
     const res = await axios.post(BASE_BACKEND_URL + "/user/create", {
-      clerkuuid: userId,
+      clerkuuid: currentUser.id,
+      firstName: currentUser.firstName,
+      lastName: currentUser.lastName,
+      email: currentUser.emailAddresses
     });
 
-    console.log(res);
-    const currentUser = await client.users.getUser(userId);
+    console.log("user created: ", res.data);
     const previousPublicMetaData = currentUser.publicMetadata;
     const udpatedPublicMetatData = {
       ...previousPublicMetaData,
       dbUserId: res?.data.data.userId,
-      role: 'member'
+      role: "member",
     };
 
     await client.users.updateUser(userId, {
@@ -32,8 +36,12 @@ export const createUserInDB = async () => {
     if (res.data.error) {
       return { message: null, error: "User not created" };
     }
-    if (res.status === 209){
-      return { message: "user already exists", error: null, data: { userId: res.data.data?.userId}}
+    if (res.status === 209) {
+      return {
+        message: "user already exists",
+        error: null,
+        data: { userId: res.data.data?.userId },
+      };
     }
     return { data: { userId: res.data.data?.userId }, message: "user created" };
   } catch (error: any) {
@@ -56,16 +64,16 @@ export const completeOnboarding = async () => {
     const udpatedPublicMetatData = {
       ...previousPublicMetaData,
       onboardingComplete: true,
-      role: "member"
+      role: "member",
     };
 
     const res = await client.users.updateUser(userId, {
-      publicMetadata: udpatedPublicMetatData
+      publicMetadata: udpatedPublicMetatData,
     });
 
     return { message: res.publicMetadata };
   } catch (err) {
-    console.log(err)
+    console.log(err);
     return { error: "There was an error updating the user metadata." };
   }
 };

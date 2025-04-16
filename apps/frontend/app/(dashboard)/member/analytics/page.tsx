@@ -60,7 +60,7 @@ export default function AnalyticsPage() {
 
   useEffect(() => {
     const fetchTasks = async () => {
-      const token = getToken();
+      const token = await getToken();
       const userDbId = user?.publicMetadata?.dbUserId;
 
       if (!token) {

@@ -79,7 +79,7 @@ export default function TasksPage() {
   // Fetch tasks on component mount
   useEffect(() => {
     const fetchTasks = async () => {
-      const token = getToken();
+      const token = await getToken();
       const userDbId = user?.publicMetadata?.dbUserId;
 
       if (!token) {
@@ -184,7 +184,7 @@ export default function TasksPage() {
       return;
     }
 
-    const token = getToken();
+    const token = await getToken();
     const userId = user?.publicMetadata?.dbUserId;
 
     if (!token) {

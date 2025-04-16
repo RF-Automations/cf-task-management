@@ -147,6 +147,7 @@ const OnboardingFlow = () => {
     const userId = user?.publicMetadata?.dbUserId;
 
     console.log("handleProfileSubmit: ", token, userId);
+
     if (!token) {
       toast.warning("Login Again please.");
       return;
@@ -223,7 +224,7 @@ const OnboardingFlow = () => {
       return;
     }
 
-    const token = getToken();
+    const token = await getToken();
     const userId = user?.publicMetadata?.dbUserId;
 
     if (!token) {

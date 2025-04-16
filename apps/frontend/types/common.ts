@@ -43,10 +43,10 @@ export interface TaskCount {
 export interface User{
   id: string;
   name: string;
+  role: string;
   email: string;
-  status: 'pending' | 'approved' | 'banned';
   createdAt: Date;
-  lastActive: Date;
+  lastActiveAt: Date;
   banned: boolean;
   approved: boolean;
 };

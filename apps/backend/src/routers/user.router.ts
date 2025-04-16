@@ -40,8 +40,9 @@ router.get('/', async (req: Request, res: Response) => {
 })
 
 router.post("/create", async (req: Request, res: Response) => {
-    const { clerkuuid } = req.body
+    const { clerkuuid, firstName, lastName, email } = req.body
 
+    console.log(firstName, lastName)
     if (!clerkuuid){
       return res.status(400).json({
         data: null,
@@ -49,6 +50,7 @@ router.post("/create", async (req: Request, res: Response) => {
         error: "Clerk Id not present"
       })
     }
+    console.log(clerkuuid)
 
     const existingUser = await prismaClient.user.findFirst({
       where: {
@@ -60,7 +62,7 @@ router.post("/create", async (req: Request, res: Response) => {
       }
     })
 
-    console.log(existingUser)
+    console.log("existing user: ", existingUser)
 
     if (existingUser){
       return res.status(209).json({ data: { userId: existingUser.id, clerkuuid}, message: "User already exists", error: null})
@@ -68,7 +70,10 @@ router.post("/create", async (req: Request, res: Response) => {
 
     const data = await prismaClient.user.create({
       data: {
-        clerkuuid
+        clerkuuid,
+        firstName,
+        lastName,
+        email
       },
       select: {
         id: true,
@@ -84,12 +89,7 @@ router.post("/create", async (req: Request, res: Response) => {
 router.post("/update", async (req: Request, res: Response) => {
   const { userId } = req.body
   const { userId: clerkuuid } = getAuth(req)
-  const userAgent = req.headers['user-agent'];
-  const authorization = req.headers.authorization;
   
-  console.log("userid: " + userId);
-  console.log('User-Agent:', userAgent);
-  console.log('Authorization:', authorization);
 
   if (!userId) {
     return res
