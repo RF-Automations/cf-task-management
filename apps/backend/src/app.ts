@@ -7,10 +7,12 @@ dotenv.config();
 
 const app: Express = express();
 
+const CORS_ORIGIN = "https://bnstech.online"
+
 app.use(express.json());
 app.use(
   cors({
-    origin: "*",
+    origin: CORS_ORIGIN,
   })
 );
 
