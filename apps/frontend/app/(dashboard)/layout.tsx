@@ -1,3 +1,4 @@
+import BreadcrumbProvider from "@/components/BreadcrumbProvider";
 import DashboardHeader from "@/components/dashboard/Header";
 import Sidebar from "@/components/dashboard/Sidebar";
 import type { Metadata } from "next";
@@ -8,7 +9,7 @@ export const metadata: Metadata = {
     "Common dashboard for members, TA's, and mentors for Code First Community.",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
@@ -19,7 +20,7 @@ export default function RootLayout({
       <div className="flex h-full lg:p-8 lg:gap-4">
         <Sidebar />
         <div className="lg:rounded-md lg:border lg:border-border lg:p-4 h-full w-full overflow-y-auto">
-          {children}
+          <BreadcrumbProvider>{children}</BreadcrumbProvider>
         </div>
       </div>
     </div>

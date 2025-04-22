@@ -255,6 +255,161 @@ router.patch("/assign-task", async (req: Request, res: Response) => {
   }
 });
 
+router.patch("/approve-task", async (req: Request, res: Response) => {
+  const { userId } = getAuth(req);
+
+  const { taskId } = req.body;
+
+  if (!taskId) {
+    return res.status(400).json({
+      message: "task id are required",
+      error: "task id need.",
+      data: null,
+    });
+  }
+
+  if (!userId) {
+    return res
+      .status(401)
+      .json({ data: null, message: null, error: "User not found" });
+  }
+
+  try {
+    const approve = await prismaClient.task.update({
+      where: {
+        id: taskId,
+      },
+      data: {
+        approved: true,
+      },
+    });
+
+    if (approve.id) {
+      return res.status(200).json({
+        message: "Task approved succefully",
+        data: approve,
+        error: null,
+      });
+    }
+  } catch (error: any) {
+    console.log(error.message);
+    return res.status(500).json({
+      message: "Server problem",
+      error: typeof error?.message && error.message,
+    });
+  }
+});
+
+router.patch("/reassign-task", async (req: Request, res: Response) => {
+  const { userId: clerkuuid } = getAuth(req);
+
+  const { userId, taskId, submissionId, feedback } = req.body;
+
+  if (!userId && !taskId && !submissionId && !feedback) {
+    return res.status(400).json({
+      message: "task id, submissionId and feedback are required",
+      error: "task id and feedback need.",
+      data: null,
+    });
+  }
+
+  if (!clerkuuid) {
+    return res
+      .status(401)
+      .json({ data: null, message: null, error: "User not found" });
+  }
+
+  try {
+    const task = await prismaClient.task.update({
+      where: {
+        id: taskId
+      },
+      data: {
+        status: 'reassigned'
+      }
+    })
+
+    const submission = await prismaClient.submission.update({
+      where: {
+        id: submissionId,
+      },
+      data: {
+        feedback,
+        reAssignedUserId: userId,
+        status: 'reassigned'
+      },
+    });
+
+    if (task.id && submission.id) {
+      return res.status(200).json({
+        message: "Task reassigned succefully",
+        data: { task, submission },
+        error: null,
+      });
+    }
+  } catch (error: any) {
+    console.log(error.message);
+    return res.status(500).json({
+      message: "Server problem",
+      error: typeof error?.message && error.message,
+    });
+  }
+});
+
+router.patch("/complete-task", async (req: Request, res: Response) => {
+  const { userId: clerkuuid } = getAuth(req);
+
+  const { userId, taskId, submissionId } = req.body;
+
+  if (!userId && !taskId && !submissionId) {
+    return res.status(400).json({
+      message: "task id and submissionId are required",
+      error: "task id and submissionId need.",
+      data: null,
+    });
+  }
+
+  if (!clerkuuid) {
+    return res
+      .status(401)
+      .json({ data: null, message: null, error: "User not found" });
+  }
+
+  try {
+    const task = await prismaClient.task.update({
+      where: {
+        id: taskId
+      },
+      data: {
+        status: 'completed'
+      }
+    })
+
+    const submission = await prismaClient.submission.update({
+      where: {
+        id: submissionId,
+      },
+      data: {
+        status: 'completed'
+      },
+    });
+
+    if (task.id && submission.id) {
+      return res.status(200).json({
+        message: "Task completed succefully",
+        data: { task, submission },
+        error: null,
+      });
+    }
+  } catch (error: any) {
+    console.log(error.message);
+    return res.status(500).json({
+      message: "Server problem",
+      error: typeof error?.message && error.message,
+    });
+  }
+});
+
 router.post("/task-create", async (req: Request, res: Response) => {
   const { userId } = getAuth(req);
 

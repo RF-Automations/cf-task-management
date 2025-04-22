@@ -9,7 +9,6 @@ function Status({
 }) {
 
   let color = "";
-  console.log(status)
   if (status === "inprogress"){
     color = "bg-yellow-100 text-yellow-800"
   } else if (status === "completed"){

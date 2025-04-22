@@ -9,7 +9,13 @@ import {
   useUser,
 } from "@clerk/nextjs";
 import React from "react";
-import { BarChart2, CheckSquare, HomeIcon, Terminal, Users } from "lucide-react";
+import {
+  BarChart2,
+  CheckSquare,
+  HomeIcon,
+  Terminal,
+  Users,
+} from "lucide-react";
 import { Button } from "../ui/button";
 import { Bell } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -60,7 +66,7 @@ const DashboardHeader = () => {
         <p className="text-sm block md:hidden font-bold">
           {(role as string).charAt(0).toUpperCase() +
             (role as string).slice(1, (role as string).length)}{" "}
-          Dashboard
+          <span className="hidden md:block">Dashboard</span>
         </p>
       </div>
       <div className="flex justify-between items-center">

@@ -69,7 +69,6 @@ const Sidebar = () => {
                 key={slug}
                 onClick={() => {
                   setActiveMenu(slug);
-                  console.log(menu.slug);
                 }}
                 className={`flex items-center justify-start gap-4 p-3 rounded-md transition 
                     ${

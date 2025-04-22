@@ -28,7 +28,7 @@ export type Task = {
 export default function TasksPage() {
   const [open, setOpen] = useState(false);
   const [tasks, setTasks] = useState<Task[]>([]);
-  const [users, setUsers] = useState([])
+  const [users, setUsers] = useState([]);
 
   const { getToken } = useAuth();
 
@@ -85,7 +85,7 @@ export default function TasksPage() {
       const users: any = await getUsers(token);
       const finalUsers: any = [];
 
-      console.log("user useEffect tasks admin: ", users)
+      console.log("user useEffect tasks admin: ", users);
 
       users.data.map((user: any) => {
         const newUser = {

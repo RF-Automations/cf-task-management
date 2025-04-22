@@ -5,9 +5,9 @@ import { Button } from "@/components/ui/button";
 import { useAuth, useUser } from "@clerk/nextjs";
 import { toast } from "sonner";
 import { AssignTaskModal } from "@/components/dashboard/AssignTaskModel";
-import { TaskDetailsModal } from "@/components/dashboard/TaskDetailsModal";
 import axios from "axios";
 import { BASE_BACKEND_URL } from "@/lib/constant";
+import { usePathname, useRouter } from "next/navigation";
 
 // Types
 interface Task {
@@ -66,15 +66,16 @@ const taskOptions: Task[] = [
 ];
 
 export default function TasksPage() {
-  const { getToken, userId } = useAuth();
+  const { getToken } = useAuth();
   const { user } = useUser();
 
   // State
   const [tasks, setTasks] = useState<Task[]>([]);
-  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
-  const [isTaskDetailsModalOpen, setIsTaskDetailsModalOpen] = useState(false);
   const [isAssignTaskModalOpen, setIsAssignTaskModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+
+  const router = useRouter()
+  const pathName = usePathname()
 
   // Fetch tasks on component mount
   useEffect(() => {
@@ -118,61 +119,9 @@ export default function TasksPage() {
     fetchTasks();
   }, [user, getToken]);
 
-  // Handle view details button click
-  const handleViewDetails = (task: Task) => {
-    setSelectedTask(task);
-    setIsTaskDetailsModalOpen(true);
-  };
-
   // Handle assign task button click
   const handleAssignTaskClick = () => {
     setIsAssignTaskModalOpen(true);
-  };
-
-  // Handle task submission from details modal
-  const handleTaskSubmission = async (data: {
-    githubLink: string;
-    sourceLinks: string[];
-    taskId: string;
-  }) => {
-    console.log(data, BASE_BACKEND_URL);
-
-    if (!userId || !user?.publicMetadata?.dbUserId) {
-      toast.error("User Not loggedin");
-      return;
-    }
-
-    if (!selectedTask) {
-      toast.error("Task not selected");
-      return;
-    }
-
-    try {
-      const response = await axios.post(
-        `${BASE_BACKEND_URL}/tasks/submit`,
-        {
-          userId: user?.publicMetadata?.dbUserId,
-          taskId: data.taskId,
-          githubLink: data.githubLink,
-          sourceLinks: data.sourceLinks,
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
-      if (response.data.error) {
-        toast.error(response.data.message!);
-        return;
-      }
-
-      toast.success("Task submitted Successfully");
-    } catch (error) {
-      console.error("Error submitting task:", error);
-      toast.error("Failed to submit the task");
-    }
   };
 
   // Handle task assignment
@@ -274,7 +223,7 @@ export default function TasksPage() {
               className="grid grid-cols-1 md:grid-cols-12 gap-2 md:gap-4 p-4 border-b hover:bg-gray-50 items-center"
             >
               {/* Mobile view - stacked layout */}
-              <div className="col-span-1 md:col-span-5 font-medium">
+              <div className="col-span-1 md:col-span-5 font-medium h-full w-full content-center cursor-pointer" onClick={() => router.push(`${pathName}/${task.id}`)}>
                 {/* {task.title} */}
                 {task.title}
               </div>
@@ -354,7 +303,7 @@ export default function TasksPage() {
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => handleViewDetails(task)}
+                  onClick={() => router.push(`${pathName}/${task.id}`)}
                 >
                   View Details
                 </Button>
@@ -363,15 +312,6 @@ export default function TasksPage() {
           ))
         )}
       </div>
-
-      {/* Modals */}
-      <TaskDetailsModal
-        isOpen={isTaskDetailsModalOpen}
-        onClose={() => setIsTaskDetailsModalOpen(false)}
-        task={selectedTask}
-        onSubmit={handleTaskSubmission}
-      />
-
       <AssignTaskModal
         isOpen={isAssignTaskModalOpen}
         onClose={() => setIsAssignTaskModalOpen(false)}

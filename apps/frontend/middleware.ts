@@ -11,7 +11,6 @@ const isProtectedRoutes = createRouteMatcher([
   "member",
 ]);
 const isOnboardingRoute = createRouteMatcher(["/onboarding"]);
-const isAuth = createRouteMatcher(["sign-in"]);
 
 const isAdminRoute = createRouteMatcher(["/admin(.*)"]);
 const isModeratorRoute = createRouteMatcher(["/moderator(.*)"]);

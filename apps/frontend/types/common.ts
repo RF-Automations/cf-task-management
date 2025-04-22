@@ -1,18 +1,22 @@
 export interface Task {
   id: string;
+  assignedBy?: string;
+  userId?: String;
+  approved?: Boolean;
   title: string;
-  difficulty_level: 'easy' | 'medium' | 'moderate' | 'hard';
   description: string;
+  difficulty_level: 'easy' | 'medium' | 'moderate' | 'hard';
+  reassigned?: Number;
   prerequisites: string;
   outcomes: string;
   deadLine?: Date;
-  completed?: Boolean;
   status?: 'assigned' | 'submitted' | 'reassigned' | 'completed' | 'inprogress'; // percentage of how much task is compeleted.
-  userId?: String;
-  approved?: Boolean;
-  reassigned?: Number;
+  completed?: Boolean;
   createdAt?: Date;
   updatedAt?: Date;
+
+
+  user?: any
 }
 
 

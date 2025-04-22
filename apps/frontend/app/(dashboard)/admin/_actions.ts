@@ -51,7 +51,7 @@ export async function assignTask(taskId: string, dead_line: Date, token: string 
         if (res.data?.data?.id){
             return {
                 message: res?.data?.message,
-                data: status,
+                data: res?.data?.data?.status,
                 error: null
             }
         }
@@ -59,6 +59,39 @@ export async function assignTask(taskId: string, dead_line: Date, token: string 
             message: "Unable to assign",
             data: null,
             error: "Unable to assign task"
+        }
+    } catch (error: any) {
+        console.log(error)
+        return {
+            message: "Server problem",
+            data: null,
+            error: typeof error.message === "string" ? error.message : "server error"
+        }
+    }
+
+}
+
+export async function approveTask(taskId: string, token: string ) {
+    try {
+        const res = await axios.patch(`${BASE_BACKEND_URL}/admin/approve-task`, {
+            taskId,
+        }, {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        })
+    
+        if (res.data?.data?.id){
+            return {
+                message: res?.data?.message,
+                data: res?.data?.data?.status,
+                error: null
+            }
+        }
+        return {
+            message: "Unable to approve",
+            data: null,
+            error: "Unable to approv task"
         }
     } catch (error: any) {
         console.log(error)

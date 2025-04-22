@@ -50,6 +50,19 @@ router.get("/:id", async (req, res) => {
       where: {
         id: id,
       },
+      include: {
+        user: {
+          select: {
+            firstName: true
+          }
+        },
+        submissions: true,
+        creator: {
+          select: {
+            firstName: true
+          }
+        }
+      }
     });
 
     return res
@@ -153,7 +166,7 @@ router.post("/submit", async (req, res) => {
         message: 'All fields are required',
         error: 'All fields are required',
         data: null
-      })
+      }).status(200)
     }
 
     try {
@@ -169,19 +182,47 @@ router.post("/submit", async (req, res) => {
       })
 
       if (!task) {
-        return res.json({ message: "Task does not exists. First create the task", error: "task not exists", data: null}).status(401)
+        return res.json({ message: "Task does not exists. First create the task", error: "task not exists", data: null}).status(200)
       }
 
       if (!task?.approved){
-        return res.json({ message: "Task cannot be submitted before approval", data: null, error: "Task cannot be submit before approval."}).status(401)
+        return res.json({ message: "Task cannot be submitted before approval", data: null, error: "Task cannot be submit before approval."}).status(200)
       }
 
+      const previousSubmissions = await prismaClient.submission.findMany({
+        where: {
+          taskId,
+          userId
+        },
+        select: {
+          status: true
+        }
+      })
+
+      const previousSubmission = previousSubmissions[previousSubmissions.length - 1]
+
+      if (previousSubmission?.status === 'completed'){
+        return res.status(200).json({
+          message: "Task already marked completed.",
+          error: "Task already completed",
+          data: null
+        })
+      }
+
+      if (previousSubmission?.status === 'submitted'){
+        return res.status(200).json({
+          message: "Wait for previous submission review.",
+          error: "Previous submission is not yet reviewd by the Admin or moderator",
+          data: null
+        })
+      }
       const submitTask = await prismaClient.submission.create({
         data: {
           github: githubLink,
           taskId,
           userId,
-          source_link: sourceLinks
+          source_link: sourceLinks,
+          status: 'submitted'
         }
       })
 
@@ -200,7 +241,7 @@ router.post("/submit", async (req, res) => {
           error: "Not able to submit task",
           message: 'Not able to submit task',
           data: null
-        }).status(409)
+        }).status(500)
       }
   
       if (submitTask.id && taskSubmitted.status === 'submitted'){

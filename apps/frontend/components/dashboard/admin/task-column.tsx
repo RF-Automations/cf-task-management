@@ -4,17 +4,11 @@ import { ColumnDef } from "@tanstack/react-table";
 import { Badge } from "@/components/ui/badge";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { toast } from "sonner";
-import { assignTask, updateTaskStatus } from "@/app/(dashboard)/admin/_actions";
+import { approveTask, assignTask } from "@/app/(dashboard)/admin/_actions";
 import { useAuth } from "@clerk/nextjs";
 import Status from "@/components/Status";
+import { usePathname, useRouter } from "next/navigation";
 
 export type Task = {
   id: string;
@@ -28,65 +22,22 @@ export type Task = {
   dead_line: Date;
 };
 
-// Custom cell components with hooks
-const StatusCell = ({ status, taskId }: { status: any; taskId: string }) => {
-  const [newStatus, setNewStatus] = useState(status);
-  const [changeStatus, setChangeStatus] = useState(false);
-  const { getToken } = useAuth();
-
-  if (!changeStatus) {
-    return <Status status={status} onClick={() => setChangeStatus(true)} />;
-  } else {
-    return (
-      <Select
-        value={newStatus}
-        onValueChange={async (value) => {
-          const token = await getToken();
-          if (!token) {
-            toast.error("Status not udpated");
-            return setNewStatus;
-          }
-          const res = await updateTaskStatus(taskId, value, token);
-
-          console.log(res);
-          if (res.data) {
-            toast.success("Status updated succesfully");
-          }
-
-          if (res.error) {
-            console.log(res.error, res.message);
-            toast.error("Status not updated");
-          }
-          setNewStatus(value)
-          return setNewStatus;
-        }}
-        onOpenChange={setChangeStatus}
-      >
-        <SelectTrigger className="w-[180px]">
-          <SelectValue placeholder="New Status" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="inprogress">In Progress</SelectItem>
-          <SelectItem value="reassigned">Re Assign</SelectItem>
-        </SelectContent>
-      </Select>
-    );
-  }
-};
-
 const DeadlineCell = ({ date, taskId }: { date: any; taskId: string }) => {
   const [input, setInput] = useState(false);
   const [newDeadline, setNewDeadline] = useState(date);
 
   const { getToken } = useAuth();
-  console.log(date)
+  console.log(date);
 
   return (
     <div className="">
       {!input ? (
         <span
           className="p-2 rounded-md w-fit cursor-pointer"
-          onClick={() => setInput(true)}
+          onClick={() => {
+            if (date) return;
+            setInput(true);
+          }}
         >
           {date ? new Date(date)?.toLocaleDateString() : "Assign"}
         </span>
@@ -101,13 +52,18 @@ const DeadlineCell = ({ date, taskId }: { date: any; taskId: string }) => {
               toast.error("Status not udpated");
               return setInput;
             }
-            const res = await assignTask(taskId, new Date(e.target.value), token);
-            
+            const approvRes = await approveTask(taskId, token);
+            const res = await assignTask(
+              taskId,
+              new Date(e.target.value),
+              token
+            );
+
             console.log(res);
-            if (res.data) {
-              toast.success("Task assigned");
+            if (res.data && approvRes.data) {
+              toast.success("Task approved & assigned");
             }
-            
+
             if (res.error) {
               console.log(res.error, res.message);
               toast.error("task not assigned");
@@ -121,10 +77,27 @@ const DeadlineCell = ({ date, taskId }: { date: any; taskId: string }) => {
   );
 };
 
+const TitleCell = ({ title, id }: { title: string, id: string }) => {
+  const router = useRouter();
+  const path = usePathname();
+  console.log(path);
+  return (
+    <span 
+    className="h-full w-full cursor-pointer" 
+    onClick={() => router.push(`${path}/${id}`)}>
+      {title}
+    </span>
+  );
+};
+
 export const task_columns: ColumnDef<Task>[] = [
   {
     accessorKey: "title",
     header: "Title",
+    cell: ({ row }) => {
+      const title = row.getValue("title") as string;
+      return <TitleCell title={title} id={row.original.id} />;
+    },
   },
   {
     accessorKey: "assignedTo",
@@ -158,8 +131,8 @@ export const task_columns: ColumnDef<Task>[] = [
     accessorKey: "status",
     header: "Status",
     cell: ({ row }) => {
-      const status = row.getValue("status") as string;
-      return <StatusCell status={status} taskId={row.original.id} />;
+      const status = row.getValue("status") as any;
+      return <Status status={status} />;
     },
   },
   {

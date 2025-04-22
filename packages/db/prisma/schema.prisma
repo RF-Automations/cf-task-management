@@ -35,9 +35,10 @@ model User {
   createdAt           DateTime  @default(now())
   updatedAt           DateTime?
 
-  task        Task[]       @relation("TaskAssignee")
-  taskCreated Task[]       @relation("TaskCreator")
-  submission  Submission[]
+  task           Task[]       @relation("TaskAssignee")
+  taskCreated    Task[]       @relation("TaskCreator")
+  tastReassigned Submission[] @relation("ReassigedUser")
+  submission     Submission[]
 }
 
 enum Role {
@@ -67,17 +68,27 @@ model Task {
   user    User @relation("TaskAssignee", fields: [userId], references: [id], onDelete: Cascade)
   creator User @relation("TaskCreator", fields: [assignedBy], references: [id], onDelete: Cascade)
 
-  submission Submission[]
+  submissions Submission[]
 }
 
 model Submission {
-  id          String   @id @default(uuid())
-  userId      String
-  taskId      String
-  github      String
-  source_link String[] @default([])
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  task        Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  id               String            @id @default(uuid())
+  userId           String
+  reAssignedUserId String?
+  taskId           String
+  github           String
+  status           SubmissionStatus?
+  source_link      String[]          @default([])
+  feedback         String?
+  user             User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  reassignedUser   User?             @relation("ReassigedUser", fields: [reAssignedUserId], references: [id], onDelete: Cascade)
+  task             Task              @relation(fields: [taskId], references: [id], onDelete: Cascade)
+}
+
+enum SubmissionStatus {
+  submitted
+  reassigned
+  completed
 }
 
 enum TaskStatus {
