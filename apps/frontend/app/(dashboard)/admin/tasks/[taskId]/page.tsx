@@ -154,7 +154,7 @@ export default function SpecificTaskPage({
       return;
     }
     setSelectedSubmission(
-      (_) =>
+      () =>
         (task?.submissions &&
           task?.submissions[task?.submissions?.length - 1]) ||
         null

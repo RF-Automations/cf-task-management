@@ -41,7 +41,6 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Textarea } from "@/components/ui/textarea";
 import axios from "axios";
 import { BASE_BACKEND_URL } from "@/lib/constant";
 import { toast } from "sonner";
