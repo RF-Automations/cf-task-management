@@ -19,7 +19,7 @@ export const createUserInDB = async () => {
       clerkuuid: currentUser.id,
       firstName: currentUser.firstName,
       lastName: currentUser.lastName,
-      email: currentUser.emailAddresses
+      email: currentUser?.emailAddresses[0]?.emailAddress
     });
 
     console.log("user created: ", res.data);
